@@ -8,8 +8,11 @@ import com.nwchecker.server.model.Contest;
 import com.nwchecker.server.model.TypeContest;
 import com.nwchecker.server.model.User;
 import com.nwchecker.server.service.*;
+import com.nwchecker.server.utils.ContestComparator;
+import com.nwchecker.server.utils.ContestStartTimeComparator;
 import com.nwchecker.server.validators.ContestValidator;
 import com.nwchecker.server.wrapper.TypeContestWrapper;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -29,6 +32,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -83,6 +88,8 @@ public class ContestController {
     public String getContests(Model model, Principal principal) {
         //get all available сontests from DB:
         List<Contest> allContests = contestService.getContests();
+        Collections.sort(allContests,new ContestStartTimeComparator());
+        Collections.reverse(allContests);
         //get unhidden contests:
         List<Contest> unhidden = new LinkedList<Contest>();
         for (Contest c : allContests) {
