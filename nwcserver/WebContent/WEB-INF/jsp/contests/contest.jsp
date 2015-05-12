@@ -22,7 +22,7 @@
 	src="${resources}js/contests/contestSignUp.js"></script>
 <script type="text/javascript"
 	src="${resources}js/contests/contestListView.js"></script>
-
+<script type="text/javascript" src="${resources}js/dropdown.js"></script>
 
 </head>
 <body>
@@ -41,22 +41,18 @@
 		</jsp:include>
 		<div class="main-block">
 			<div id="accordion">
-
-				<form role="form">
-					<label class="radio-inline"> <input type="radio"
-						name="optradio">All
-					</label> <label class="radio-inline"> <input type="radio"
-						name="optradio"><spring:message
-										code="contest.going.label" />
-					</label> <label class="radio-inline"> <input type="radio"
-						name="optradio"><spring:message
-										code="contest.preparing.label" />
-					</label> <label class="radio-inline"> <input type="radio"
-						name="optradio"><spring:message
-										code="contest.release.label" />
-					</label>
-				</form>
-
+				<div class="dropdown">
+					<button type="button"
+						id="dropdownMenu" data-toggle="dropdown">
+						Select by status <span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
+						<li><a tabindex="-1" href="#">All</a></li>
+						<li><a tabindex="-1" href="#"><spring:message code="contest.going.label" /></a></li>
+						<li><a tabindex="-1" href="#"><spring:message code="contest.preparing.label" /></a></li>
+						<li><a tabindex="-1" href="#"><spring:message code="contest.release.label" /></a></li>
+					</ul>
+				</div>
 				<c:forEach items="${contests}" var="contest" varStatus="row">
 					<a class="list-group-item" data-toggle="collapse"
 						data-parent="#accordion" href="#collapse${row.index}">
