@@ -5,6 +5,7 @@ import com.nwchecker.server.json.ErrorMessage;
 import com.nwchecker.server.json.UserJson;
 import com.nwchecker.server.json.ValidationResponse;
 import com.nwchecker.server.model.Contest;
+import com.nwchecker.server.model.Contest.Status;
 import com.nwchecker.server.model.TypeContest;
 import com.nwchecker.server.model.User;
 import com.nwchecker.server.service.*;
@@ -32,7 +33,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.security.Principal;
 import java.util.ArrayList;
-
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -415,4 +415,53 @@ public class ContestController {
         }
         return result;
     }
+    //new method /////////////////////////////////////////// delete this comment
+    
+    @RequestMapping("/getContestsByStatus.do")
+    public String getContestsByStatus(@RequestParam("contestStatus") Contest.Status contestStatus, Model model, Principal principal) {
+        //get сontests by status from DB:
+        List<Contest> contestByStatus = contestService.getContestByStatus(Contest.Status.RELEASE);
+        Collections.sort(contestByStatus,new ContestStartTimeComparator());
+        Collections.reverse(contestByStatus);
+        //get unhidden contests:
+        List<Contest> unhidden = new LinkedList<Contest>();
+        for (Contest c : contestByStatus) {
+            if (!c.isHidden()) {
+                unhidden.add(c);
+            }
+        }
+        if (principal == null) {
+            //return all "unhidden" contests:
+            model.addAttribute("contestsByStatus", unhidden);
+            return "contests/contest";
+        }
+
+        User user = userService.getUserByUsername(principal.getName());
+
+        if (((UsernamePasswordAuthenticationToken) principal).getAuthorities()
+                .contains(new SimpleGrantedAuthority("ROLE_TEACHER"))) {
+            List<String> editableContestIndexes = new LinkedList<String>();
+            //getContests which user can edit:
+            if ((user.getContest() != null) && (user.getContest().size() > 0)) {
+                for (Contest c : user.getContest()) {
+                    if (c.getStatus().equals(Contest.Status.PREPARING) || c.getStatus().equals(Contest.Status.ARCHIVE)) {
+                        //set index for view
+                        if (c.getStatus().equals(Contest.Status.PREPARING)) {
+                            editableContestIndexes.add("index" + c.getId() + "index");
+                        }
+                        //add Contest to unhidden list:
+                        if (c.isHidden()) {
+                            unhidden.add(c);
+                        }
+                    }
+                }
+            }
+            model.addAttribute("editContestIndexes", editableContestIndexes);
+            //set usernames for editing contests:
+            model.addAttribute("nowContestEdits", contestEditWatcherService.getNowEditsMap());
+        }
+        model.addAttribute("contestsByStatus", unhidden);
+        return "contests/contest";
+    }
+    
 }
