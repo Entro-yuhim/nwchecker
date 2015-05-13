@@ -41,18 +41,14 @@
 		</jsp:include>
 		<div class="main-block">
 			<div id="accordion">
-				<div class="dropdown">
-					<button type="button"
-						id="dropdownMenu" data-toggle="dropdown">
-						Select by status <span class="caret"></span>
-					</button>
-					<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
-						<li><a tabindex="-1" href="#">All</a></li>
-						<li><a tabindex="-1" href="#"><spring:message code="contest.going.label" /></a></li>
-						<li><a tabindex="-1" href="#"><spring:message code="contest.preparing.label" /></a></li>
-						<li><a tabindex="-1" href="#"><spring:message code="contest.release.label" /></a></li>
-					</ul>
-				</div>
+				<form action="..." method="post">
+					<select>
+						<option value="all">All</option>
+						<option value="going"><spring:message code="contest.going.label" /></option>
+						<option value="preparing"><spring:message code="contest.preparing.label" /></option>
+						<option value="realese"><spring:message code="contest.release.label" />	</option>
+				    </select>
+				</form>
 				<c:forEach items="${contests}" var="contest" varStatus="row">
 					<a class="list-group-item" data-toggle="collapse"
 						data-parent="#accordion" href="#collapse${row.index}">
