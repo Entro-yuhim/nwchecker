@@ -37,6 +37,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.xml.ws.soap.AddressingFeature.Responses;
+
 /**
  * <h1>Contest Controller</h1>
  * This spring controller contains mapped methods, that allows
@@ -84,6 +86,7 @@ public class ContestController {
      *                  tries to call this method
      * @return <b>contest.jsp</b> Returns page when user can view contests
      */
+    /*
     @RequestMapping("/getContests")
     public String getContests(Model model, Principal principal) {
         //get all available сontests from DB:
@@ -130,7 +133,7 @@ public class ContestController {
         model.addAttribute("contests", unhidden);
         return "contests/contest";
     }
-
+*/
     /**
      * This mapped method used to return page when teacher
      * can create new contest.
@@ -417,10 +420,10 @@ public class ContestController {
     }
     //new method /////////////////////////////////////////// delete this comment
     
-    @RequestMapping("/getContestsByStatus.do")
-    public String getContestsByStatus(@RequestParam("contestStatus") Contest.Status contestStatus, Model model, Principal principal) {
+    @RequestMapping("/getContests")
+    public String getContestsByStatus(@RequestParam("contestStatus") Status contestStatus, Model model, Principal principal) {
         //get сontests by status from DB:
-        List<Contest> contestByStatus = contestService.getContestByStatus(Contest.Status.RELEASE);
+        List<Contest> contestByStatus = contestService.getContestByStatus(Contest.Status.PREPARING);
         Collections.sort(contestByStatus,new ContestStartTimeComparator());
         Collections.reverse(contestByStatus);
         //get unhidden contests:
@@ -432,7 +435,7 @@ public class ContestController {
         }
         if (principal == null) {
             //return all "unhidden" contests:
-            model.addAttribute("contestsByStatus", unhidden);
+            model.addAttribute("contests", unhidden);
             return "contests/contest";
         }
 
@@ -460,7 +463,7 @@ public class ContestController {
             //set usernames for editing contests:
             model.addAttribute("nowContestEdits", contestEditWatcherService.getNowEditsMap());
         }
-        model.addAttribute("contestsByStatus", unhidden);
+        model.addAttribute("contests", unhidden);
         return "contests/contest";
     }
     
