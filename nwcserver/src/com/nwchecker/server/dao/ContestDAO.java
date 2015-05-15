@@ -65,11 +65,16 @@ public interface ContestDAO {
 	 *            Specific status of required Contests
 	 * @return List of Contests that have specific status
 	 */
-	public List<Contest> getContestByStatus(Contest.Status status);
+	 public List<Contest> getContestByStatus(Contest.Status status);
+	 
 
-	// public List<Contest> getPagedContestsByStatus(Contest.Status status, int
-	// pageSize, int startIndex);
-	//
-	// public Long getPageCount(Contest.Status status, int pageSize);
+	 public List<Contest> getPagedContests( int pageSize, int startIndex);
+	
+	 public Long getEntryCount();
+	 
+	 
+	 public List<Contest> getPagedContests(Contest.Status status, int pageSize, int startIndex);
+		
+	 public Long getEntryCount(Contest.Status status);
 
 }

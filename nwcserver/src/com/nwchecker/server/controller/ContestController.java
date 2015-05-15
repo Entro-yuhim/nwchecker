@@ -88,11 +88,12 @@ public class ContestController {
 	 */
 
 	@RequestMapping("/getContests")
-	public String getContests(Model model, Principal principal) {
+	public String getContests(@RequestParam (defaultValue="1") int page,@RequestParam (defaultValue="3") int pageSize, Model model, Principal principal) {
+		Long count = contestService.getPageCount(pageSize);
+		model.addAttribute("currentPage" , page);
+		model.addAttribute("pageCount" ,count );
 		// get all available сontests from DB:
-		List<Contest> allContests = contestService.getContests();
-		Collections.sort(allContests, new ContestStartTimeComparator());
-		Collections.reverse(allContests);
+		List<Contest> allContests = contestService.getPagedContests(pageSize, page);
 		// get unhidden contests:
 		List<Contest> unhidden = new LinkedList<Contest>();
 		for (Contest c : allContests) {
@@ -466,13 +467,14 @@ public class ContestController {
 	}
 
 	@RequestMapping("/getContestsByStatus")
-	public String getContestsByStatus(@RequestParam("status") String status,
+	public String getContestsByStatus(@RequestParam (defaultValue="1") int page,@RequestParam (defaultValue="3") int pageSize,@RequestParam("status") String status,
 			Model model, Principal principal) {
 		// get сontests by status from DB:
-		List<Contest> contestByStatus = contestService
-				.getContestByStatus(Contest.Status.stringToStatus(status));
-		Collections.sort(contestByStatus, new ContestStartTimeComparator());
-		Collections.reverse(contestByStatus);
+		Long count = contestService.getPageCount(Contest.Status.stringToStatus(status), pageSize);
+		model.addAttribute("currentPage" , page);
+		model.addAttribute("pageCount" ,count );
+		
+		List<Contest> contestByStatus = contestService.getPagedContests(Contest.Status.stringToStatus(status), pageSize, page);				
 		// get unhidden contests:
 		List<Contest> unhidden = new LinkedList<Contest>();
 		for (Contest c : contestByStatus) {

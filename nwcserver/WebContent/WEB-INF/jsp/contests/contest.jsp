@@ -216,7 +216,7 @@
 						<c:if test="${currentPage + loop - 3>0}">
 							<c:if test="${currentPage + loop - 3<pageCount + 1}">
 								<li><a
-									href="<c:url value="/contest.do">
+									href="<c:url value="/getContests.do">
 										<c:param name="page" value="${currentPage + loop - 3}"/>
 										</c:url>">
 										<c:out value="${currentPage + loop - 3}" />

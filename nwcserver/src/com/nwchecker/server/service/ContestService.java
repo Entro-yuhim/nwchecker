@@ -73,5 +73,13 @@ public interface ContestService {
      *         <b>false</b> if User can not edit Contest
      */
     public boolean checkIfUserHaveAccessToContest(String username, int ContestId);
+    
+    public List<Contest> getPagedContests(int pageSize, int pageNumber);
+    
+    public List<Contest> getPagedContests(Contest.Status status, int pageSize, int pageNumber);
+    
+    public Long getPageCount(int pageSize);
+    
+    public Long getPageCount(Contest.Status status, int pageSize);
 
 }
