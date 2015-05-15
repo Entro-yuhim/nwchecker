@@ -45,20 +45,28 @@
 				<div class="dropdown">
 					<button class="btn btn-primary dropdown-toggle" type="button"
 						data-toggle="dropdown">
-						Filter <span class="caret"></span>
+						<%=request.getParameter("status") == null ? "ALL CONTESTS"
+					: request.getParameter("status")%>
+						<span class="caret"></span>
 					</button>
 					<ul class="dropdown-menu">
-						<li><a href="/NWCServer/getContests.do">All</a></li>
-						<li><a href="<c:url value="/getContestsByStatus.do?status=GOING"/>">
-								<spring:message code="contest.going.label" /> </a></li>
-						<li><a href="<c:url value="/getContestsByStatus.do?status=PREPARING"/>">
-								<spring:message code="contest.preparing.label" /></a></li>
-						<li><a href="<c:url value="/getContestsByStatus.do?status=RELEASE"/>">
-								<spring:message code="contest.release.label" /></a></li>
-							<li><a href="<c:url value="/getContestsByStatus.do?status=ARCHIVE"/>">
-								Arhive
-						</a>
-						</li>
+						<li><a href="/NWCServer/getContests.do">All Contests</a></li>
+						<li><a
+							href="<c:url value="/getContestsByStatus.do?status=GOING"/>">
+								<spring:message code="contest.going.label" />
+						</a></li>
+						<li><a
+							href="<c:url value="/getContestsByStatus.do?status=PREPARING"/>">
+								<spring:message code="contest.preparing.label" />
+						</a></li>
+						<li><a
+							href="<c:url value="/getContestsByStatus.do?status=RELEASE"/>">
+								<spring:message code="contest.release.label" />
+						</a></li>
+						<li><a
+							href="<c:url value="/getContestsByStatus.do?status=ARCHIVE"/>">
+								<spring:message code="contest.archive.label" />
+						</a></li>
 					</ul>
 				</div>
 
@@ -78,6 +86,11 @@
 							<c:if test="${contest.status=='RELEASE'}">
 								<label class="label label-info contestsStatus"> <spring:message
 										code="contest.release.label" />
+								</label>
+							</c:if>
+							<c:if test="${contest.status=='ARCHIVE'}">
+								<label class="label label-danger contestsStatus"> <spring:message
+										code="contest.archive.label" />
 								</label>
 							</c:if>
 							<c:if test="${contest.hidden==true}">
@@ -196,21 +209,22 @@
 						</button>
 					</div>
 				</security:authorize>
-				<nav>
-					<ul class="pagination">
-						<li><a href="#" aria-label="Previous"> <span
-								aria-hidden="true">&laquo;</span>
-						</a></li>
-						<li><a href="#">1</a></li>
-						<li><a href="#">2</a></li>
-						<li><a href="#">3</a></li>
-						<li><a href="#">4</a></li>
-						<li><a href="#">5</a></li>
-						<li><a href="#" aria-label="Next"> <span
-								aria-hidden="true">&raquo;</span>
-						</a></li>
-					</ul>
-				</nav>
+			</div>
+			<div class="text-center">
+				<ul class="pagination">
+					<c:forEach begin="0" end="5" var="loop">
+						<c:if test="${currentPage + loop - 3>0}">
+							<c:if test="${currentPage + loop - 3<pageCount + 1}">
+								<li><a
+									href="<c:url value="/contest.do">
+										<c:param name="page" value="${currentPage + loop - 3}"/>
+										</c:url>">
+										<c:out value="${currentPage + loop - 3}" />
+								</a></li>
+							</c:if>
+						</c:if>
+					</c:forEach>
+				</ul>
 			</div>
 		</div>
 	</div>

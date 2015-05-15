@@ -33,7 +33,7 @@
                     <li class="list-group-item">
                         <span class="row">
                             <span class="pull-left">
-                                <b>${archived.title}</b>
+                                <b><a href="${results}">${archived.title}</a></b>
                                 <br/>
                                 <spring:message code="contest.results.started.caption"/>
                                 ${fn:substring(archived.starts,0,16)}
@@ -41,9 +41,9 @@
                                 ${fn:substring(archived.duration,11,16)})
                             </span>
                             <span class="pull-right">
-                                <a class="btn btn-md btn-info pull-right" href="${results}">
-                                    <spring:message code="rating.openResults.button.caption"/>
-                                </a>
+                                <label class="label label-danger contestsStatus"> <spring:message
+										code="contest.archive.label" />
+								</label>
                             </span>
                         </span>
                     </li>
@@ -55,7 +55,7 @@
                     <li class="list-group-item">
                         <span class="row">
                             <span class="pull-left">
-                                <b>${type2.title}</b>
+                                <b><a href="${results}">${type2.title}</a></b>
                                 <br/>
                                 <spring:message code="contest.results.started.caption"/>
                                 ${fn:substring(type2.starts,0,16)}
@@ -63,9 +63,8 @@
                                 ${fn:substring(type2.duration,11,16)})
                             </span>
                             <span class="pull-right">
-                                <a class="btn btn-md btn-info pull-right" href="${results}">
-                                    <spring:message code="rating.openResults.button.caption"/>
-                                </a>
+                                <label class="label label-success contestsStatus"> <spring:message
+										code="contest.going.label" /></label>
                             </span>
                         </span>
                     </li>
