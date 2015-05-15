@@ -86,10 +86,10 @@ public class ContestController {
      *                  tries to call this method
      * @return <b>contest.jsp</b> Returns page when user can view contests
      */
-    /*
+    
     @RequestMapping("/getContests")
     public String getContests(Model model, Principal principal) {
-        //get all available сontests from DB:
+        //get all available сontests from DB:    	
         List<Contest> allContests = contestService.getContests();
         Collections.sort(allContests,new ContestStartTimeComparator());
         Collections.reverse(allContests);
@@ -133,7 +133,7 @@ public class ContestController {
         model.addAttribute("contests", unhidden);
         return "contests/contest";
     }
-*/
+
     /**
      * This mapped method used to return page when teacher
      * can create new contest.
@@ -418,12 +418,13 @@ public class ContestController {
         }
         return result;
     }
+    
     //new method /////////////////////////////////////////// delete this comment
     
-    @RequestMapping("/getContests")
-    public String getContestsByStatus(@RequestParam("contestStatus") Status contestStatus, Model model, Principal principal) {
+    @RequestMapping("/getContestsByStatus")
+    public String getContestsByStatus(@RequestParam("status") String status,Model model, Principal principal) {
         //get сontests by status from DB:
-        List<Contest> contestByStatus = contestService.getContestByStatus(Contest.Status.PREPARING);
+        List<Contest> contestByStatus = contestService.getContestByStatus(Contest.Status.stringToStatus(status));
         Collections.sort(contestByStatus,new ContestStartTimeComparator());
         Collections.reverse(contestByStatus);
         //get unhidden contests:

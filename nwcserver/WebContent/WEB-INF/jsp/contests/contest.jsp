@@ -41,23 +41,27 @@
 		</jsp:include>
 		<div class="main-block">
 			<div id="accordion">
-				<form:form 	modelAttribute="contests" action="/getContests" method="get">
-					<div class="dropdown">				
-						<button class="btn btn-primary dropdown-toggle" type="button"
-							data-toggle="dropdown">
-							Filter <span class="caret"></span>
-						</button>
-						<ul class="dropdown-menu">
-						<li><a href="/getContests">All</a></li>
-							<li><a href="${contestStatus==GOING}"> <spring:message
-							code="contest.going.label" /></a></li>
-							<li><a href="${contestStatus==PREPARING}"><spring:message
-							code="contest.preparing.label" /></a></li>
-							<li><a href="${contestStatus==REALEASE}"><spring:message
-							code="contest.release.label" /></a></li>
-						</ul>
-					</div>
-				</form:form>
+
+				<div class="dropdown">
+					<button class="btn btn-primary dropdown-toggle" type="button"
+						data-toggle="dropdown">
+						Filter <span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu">
+						<li><a href="/NWCServer/getContests.do">All</a></li>
+						<li><a href="<c:url value="/getContestsByStatus.do?status=GOING"/>">
+								<spring:message code="contest.going.label" /> </a></li>
+						<li><a href="<c:url value="/getContestsByStatus.do?status=PREPARING"/>">
+								<spring:message code="contest.preparing.label" /></a></li>
+						<li><a href="<c:url value="/getContestsByStatus.do?status=RELEASE"/>">
+								<spring:message code="contest.release.label" /></a></li>
+							<li><a href="<c:url value="/getContestsByStatus.do?status=ARCHIVE"/>">
+								Arhive
+						</a>
+						</li>
+					</ul>
+				</div>
+
 				<c:forEach items="${contests}" var="contest" varStatus="row">
 					<a class="list-group-item" data-toggle="collapse"
 						data-parent="#accordion" href="#collapse${row.index}">
