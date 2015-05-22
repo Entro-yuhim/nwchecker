@@ -2,6 +2,7 @@ package com.nwchecker.server.service;
 
 import com.nwchecker.server.dao.ContestDAO;
 import com.nwchecker.server.model.Contest;
+import com.nwchecker.server.model.User;
 
 import java.util.List;
 import java.util.Map;
@@ -77,4 +78,7 @@ public interface ContestService {
     public Long getPageCount(Contest.Status status, int pageSize);
 
     Long getContestEndTime(Contest contest);
+
+    public List<Contest> getUserPagedContests(int pageSize, int pageNumber, User user);
+    public Long getUserEntryCount(int userId, int pageSize);
 }

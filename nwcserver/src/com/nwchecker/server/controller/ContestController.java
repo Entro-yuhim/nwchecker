@@ -43,7 +43,7 @@ import javax.xml.ws.soap.AddressingFeature.Responses;
  * <h1>Contest Controller</h1>
  * This spring controller contains mapped methods, that allows
  * to read, create and edit contests in database.
- * <p>
+ * <p/>
  * <b>Note:</b>Only teacher allows to create and change contests.
  * Other users can only view contests information
  *
@@ -79,38 +79,25 @@ public class ContestController {
 
     /**
      * This mapped method used to return page with contests list
-     * <p>
+     * <p/>
      *
-     * @param model Spring Framework model for this page
+     * @param model     Spring Framework model for this page
      * @param principal This is general information about user, who
      *                  tries to call this method
      * @return <b>contest.jsp</b> Returns page when user can view contests
      */
-    @Link(label="contest.caption", family="contests", parent = "")
+    @Link(label = "contest.caption", family = "contests", parent = "")
     @RequestMapping("/getContests")
-    public String getContests(@RequestParam (defaultValue="1") int page,@RequestParam (defaultValue="3") int pageSize, Model model, Principal principal) {
-        Long count = contestService.getPageCount(pageSize);
-        model.addAttribute("currentPage" , page);
-        model.addAttribute("pageCount", count);
-        // get all available сontests from DB:
-        List<Contest> allContests = contestService.getPagedContests(pageSize, page);
-        // get unhidden contests:
-        List<Contest> unhidden = new LinkedList<Contest>();
-        for (Contest c : allContests) {
-            if (!c.isHidden()) {
-                unhidden.add(c);
-            }
-        }
-        if (principal == null) {
-            //return all "unhidden" contests:
-            model.addAttribute("contests", unhidden);
-            return "nwcserver.contests.list";
-        }
-
-        User user = userService.getUserByUsername(principal.getName());
-
-        if (((UsernamePasswordAuthenticationToken) principal).getAuthorities()
-                .contains(new SimpleGrantedAuthority("ROLE_TEACHER"))) {
+    public String getContests(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "3") int pageSize, Model model, Principal principal) {
+        Long count = null;
+        List<Contest> allContests = null;
+        if ((principal == null) || (!((UsernamePasswordAuthenticationToken) principal).getAuthorities()
+                .contains(new SimpleGrantedAuthority("ROLE_TEACHER")))) {
+            count = contestService.getPageCount(pageSize);
+            allContests = contestService.getPagedContests(pageSize, page);
+        } else
+        {
+            User user = userService.getUserByUsername(principal.getName());
             List<String> editableContestIndexes = new LinkedList<String>();
             //getContests which user can edit:
             if ((user.getContest() != null) && (user.getContest().size() > 0)) {
@@ -122,45 +109,48 @@ public class ContestController {
                             editableContestIndexes.add("index" + c.getId()
                                     + "index");
                         }
-                        // add Contest to unhidden list:
-                        if (c.isHidden()) {
-                            unhidden.add(c);
-                        }
                     }
                 }
             }
+            count = contestService.getUserEntryCount(user.getUserId(), pageSize);
+            allContests = contestService.getUserPagedContests(pageSize, page, user);
+
             model.addAttribute("editContestIndexes", editableContestIndexes);
             // set usernames for editing contests:
             model.addAttribute("nowContestEdits",
                     contestEditWatcherService.getNowEditsMap());
         }
-        model.addAttribute("contests", unhidden);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("pageCount", count);
+
+        model.addAttribute("contests", allContests);
         return "nwcserver.contests.list";
     }
+
 
     /**
      * This mapped method used to return page when teacher
      * can create new contest.
-     * <p>
+     * <p/>
      * <b>Note:</b>Only TEACHER has rights to use this method.
      *
-     * @param model Spring Framework model for this page
+     * @param model     Spring Framework model for this page
      * @param principal This is general information about user, who
      *                  tries to call this method
      * @return <b>contestCreate.jsp</b> Returns page where user can create new contest
      */
-    @Link(label="contestCreate.caption", family="contests", parent = "contest.caption")
+    @Link(label = "contestCreate.caption", family = "contests", parent = "contest.caption")
     @PreAuthorize("hasRole('ROLE_TEACHER')")
     @RequestMapping(value = "/addContest", method = RequestMethod.GET)
     public String initAddContest(Model model, Principal principal) {
-    	model.addAttribute("pageName","contest");
+        model.addAttribute("pageName", "contest");
         LOG.info("\"" + principal.getName() + "\"" + " starts contest creation.");
         Contest c = new Contest();
         c.setHidden(true);
         c.setStatus(Contest.Status.PREPARING);
         model.addAttribute("contestModelForm", c);
 
-        List<TypeContest> typeContestList= typeContestService.getAllTypeContest();
+        List<TypeContest> typeContestList = typeContestService.getAllTypeContest();
         model.addAttribute("typeContestList", typeContestList);
 
         return "nwcserver.contests.create";
@@ -169,15 +159,15 @@ public class ContestController {
     /**
      * This mapped method used to receive new contest data and
      * create new contest in database.
-     * <p>
+     * <p/>
      * <b>Note:</b>Only TEACHER has rights to use this method.
      *
      * @param contestAddForm Data set that contains information about new contest
-     * @param principal This is general information about user, who
-     *                  tries to call this method
-     * @param result General spring interface that used in data validation
+     * @param principal      This is general information about user, who
+     *                       tries to call this method
+     * @param result         General spring interface that used in data validation
      * @return Returns "SUCCESS" status if <b>success</b>.
-     *         Returns "FAIL" status if <b>fails</b>.
+     * Returns "FAIL" status if <b>fails</b>.
      */
     @PreAuthorize("hasRole('ROLE_TEACHER')")
     @RequestMapping(value = "/addContest", method = RequestMethod.POST)
@@ -246,16 +236,16 @@ public class ContestController {
     /**
      * This mapped method used to return page where teacher
      * can edit selected contest.
-     * <p>
+     * <p/>
      * <b>Note:</b>Only TEACHER has rights to use this method.
      *
-     * @param id ID of contest that will be edited
+     * @param id        ID of contest that will be edited
      * @param principal This is general information about user, who
      *                  tries to call this method
-     * @param model Spring Framework model for this page
+     * @param model     Spring Framework model for this page
      * @return <b>contestCreate.jsp</b> Returns page where teacher can edit contest
      */
-    @Link(label="contestEdit.caption", family="contests", parent = "contest.caption")
+    @Link(label = "contestEdit.caption", family = "contests", parent = "contest.caption")
     @PreAuthorize("hasRole('ROLE_TEACHER')")
     @RequestMapping(value = "/editContest", method = RequestMethod.GET, params = "id")
     public String initEditContest(@RequestParam("id") int id, Principal principal, Model model) {
@@ -267,7 +257,7 @@ public class ContestController {
         //add contest to view and forward it:
         model.addAttribute("contestModelForm", editContest);
 
-        List<TypeContest> typeContestList= typeContestService.getAllTypeContest();
+        List<TypeContest> typeContestList = typeContestService.getAllTypeContest();
         model.addAttribute("typeContestList", typeContestList);
         model.addAttribute("pageName", "contest");
         return "nwcserver.contests.create";
@@ -276,7 +266,7 @@ public class ContestController {
     /**
      * This mapped method used to return list of teachers that
      * have rights to edit this contest.
-     * <p>
+     * <p/>
      * <b>Note:</b>Only TEACHERs and ADMINs have rights to use this method.
      *
      * @param contestId ID of selected contest
@@ -286,7 +276,9 @@ public class ContestController {
      */
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_TEACHER')")
     @RequestMapping(value = "/getContestUsersList.do", method = RequestMethod.GET)
-    public @ResponseBody LinkedList<UserJson> getUsers(
+    public
+    @ResponseBody
+    LinkedList<UserJson> getUsers(
             @RequestParam("contestId") int contestId, Principal principal) {
         // create UserJson result list:
         LinkedList<UserJson> result = new LinkedList<UserJson>();
@@ -328,19 +320,21 @@ public class ContestController {
     /**
      * This mapped method used to set list of teachers that
      * have rights to edit this contest.
-     * <p>
+     * <p/>
      * <b>Note:</b>Only TEACHERs and ADMINs have rights to use this method.
      *
      * @param contestId ID of selected contest
      * @param principal This is general information about user, who
      *                  tries to call this method
-     * @param userIds List of users IDs that will have rights to edit contest
+     * @param userIds   List of users IDs that will have rights to edit contest
      * @return Returns "SUCCESS" status if <b>success</b>.
-     *         Returns "FAIL" status if <b>fails</b>.
+     * Returns "FAIL" status if <b>fails</b>.
      */
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_TEACHER')")
     @RequestMapping(value = "/setContestUsers.do", method = RequestMethod.POST)
-    public @ResponseBody ValidationResponse setContestUsers(
+    public
+    @ResponseBody
+    ValidationResponse setContestUsers(
             @RequestParam("contestId") int contestId, Principal principal,
             @RequestParam("userIds[]") int[] userIds) {
         if (!((UsernamePasswordAuthenticationToken) principal).getAuthorities()
@@ -383,7 +377,7 @@ public class ContestController {
 
     /**
      * This mapped method used to change contest status to "RELEASE"
-     * <p>
+     * <p/>
      * <b>Note:</b>Only TEACHER has rights to use this method.
      *
      * @param contestId ID of selected contest
@@ -393,7 +387,9 @@ public class ContestController {
      */
     @PreAuthorize("hasRole('ROLE_TEACHER')")
     @RequestMapping(value = "/stopContestPrepare.do", method = RequestMethod.GET)
-    public @ResponseBody ValidationResponse stopContestPreparing(
+    public
+    @ResponseBody
+    ValidationResponse stopContestPreparing(
             @RequestParam("id") int contestId, Principal principal) {
         if (!contestService.checkIfUserHaveAccessToContest(principal.getName(),
                 contestId)) {
@@ -429,15 +425,15 @@ public class ContestController {
         }
         return result;
     }
-    
-    @Link(label="contest.caption", family="contests", parent = "")
+
+    @Link(label = "contest.caption", family = "contests", parent = "")
     @RequestMapping("/getContestsByStatus")
-    public String getContestsByStatus(@RequestParam (defaultValue="1") int page,@RequestParam (defaultValue="3") int pageSize,@RequestParam("status") String status,
+    public String getContestsByStatus(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "3") int pageSize, @RequestParam("status") String status,
                                       Model model, Principal principal) {
         // get сontests by status from DB:
         Long count = contestService.getPageCount(Contest.Status.stringToStatus(status), pageSize);
-        model.addAttribute("currentPage" , page);
-        model.addAttribute("pageCount" ,count );
+        model.addAttribute("currentPage", page);
+        model.addAttribute("pageCount", count);
 
         List<Contest> contestByStatus = contestService.getPagedContests(Contest.Status.stringToStatus(status), pageSize, page);
         // get unhidden contests:

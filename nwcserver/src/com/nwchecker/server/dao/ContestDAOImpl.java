@@ -2,11 +2,13 @@ package com.nwchecker.server.dao;
 
 import com.nwchecker.server.json.ContestPassJson;
 import com.nwchecker.server.model.Contest;
-
+import com.nwchecker.server.model.User;
 import com.nwchecker.server.utils.ContestStartTimeComparator;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.type.LongType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
 import org.springframework.stereotype.Repository;
@@ -90,6 +92,8 @@ public class ContestDAOImpl extends HibernateDaoSupport implements ContestDAO {
 		query.setParameter("hidden", false);
 		return query.list();
 	}
+
+
     @Transactional
 	@Override
 	public Long getEntryCount() {
@@ -134,5 +138,25 @@ public class ContestDAOImpl extends HibernateDaoSupport implements ContestDAO {
         Session session = getHibernateTemplate().getSessionFactory().getCurrentSession();;
         Query query = session.createQuery("from Contest where status='ARCHIVE' order by starts desc");
         return (Contest) query.setMaxResults(1).uniqueResult();
+    }
+    @Transactional
+    @Override
+    public List<Contest> getUserPagedContests(int pageSize, int startIndex, User user) {
+        Session session = getHibernateTemplate().getSessionFactory().getCurrentSession();
+        SQLQuery query= session.createSQLQuery("(select * from contest where hidden=0) union distinct (select c.* from contest c inner join contest_users cu on (cu.contest_id=c.id) where cu.user_id=:userId) order by starts desc ");
+        query.setFirstResult(startIndex);
+        query.setParameter("userId", user.getUserId());
+        query.setMaxResults(pageSize);
+   //     query.setParameter("hidden", true);
+        query.addEntity(Contest.class);
+        return query.list();
+    }
+    @Transactional
+    public Long getUserEntryCount(int userId) {
+        Session session = getHibernateTemplate().getSessionFactory().getCurrentSession();
+        SQLQuery query = session.createSQLQuery("select count(*) as count from ((select * from contest where hidden=0) union distinct (select c.* from contest c inner join contest_users cu on (cu.contest_id=c.id) where cu.user_id=:userId)) x ");
+        query.setParameter("userId", userId);
+        query.addScalar("count", LongType.INSTANCE);
+        return (Long) query.uniqueResult();
     }
 }

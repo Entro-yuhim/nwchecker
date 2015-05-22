@@ -71,18 +71,20 @@ public class ContestServiceImpl implements ContestService {
         return contestDAO.getContestsForRating();
     }
 
+    @Override
     public List<Contest> getPagedContests(int pageSize, int pageNumber) {
-        return contestDAO.getPagedContests(pageSize, (pageNumber-1)*pageSize);
+        return contestDAO.getPagedContests(pageSize, (pageNumber - 1) * pageSize);
+    }
+
+    public Long getPageCount(int pageSize){
+        Long count = contestDAO.getEntryCount();
+        if (count%pageSize==0)
+            return count/pageSize;
+        else return count/pageSize+1;
     }
     
     public List<Contest> getPagedContests(Contest.Status status, int pageSize, int pageNumber) {
         return contestDAO.getPagedContests(status, pageSize, (pageNumber-1)*pageSize);
-    }
-    public Long getPageCount(int pageSize){
-    	Long count = contestDAO.getEntryCount();
-    	if (count%pageSize==0)
-    	return count/pageSize;
-    	else return count/pageSize+1;
     }
     
     public Long getPageCount(Contest.Status status, int pageSize){
@@ -103,5 +105,18 @@ public class ContestServiceImpl implements ContestService {
         endDate.add(Calendar.SECOND, duration.get(Calendar.SECOND));
         long gtmMillis = endDate.getTimeInMillis() - endDate.getTimeZone().getRawOffset();
         return gtmMillis;
+    }
+
+    @Override
+    public List<Contest> getUserPagedContests(int pageSize, int pageNumber, User user) {
+        return contestDAO.getUserPagedContests(pageSize, (pageNumber - 1) * pageSize, user);
+    }
+
+    @Override
+    public Long getUserEntryCount(int userId, int pageSize){
+        Long count = contestDAO.getUserEntryCount(userId);
+        if (count%pageSize==0)
+            return count/pageSize;
+        else return count/pageSize+1;
     }
 }
