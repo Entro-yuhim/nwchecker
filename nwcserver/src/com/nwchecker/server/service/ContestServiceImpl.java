@@ -53,7 +53,7 @@ public class ContestServiceImpl implements ContestService {
         User teacher = userService.getUserByUsername(username);
         if ((teacher.getContest() != null) && (teacher.getContest().size() > 0)) {
             for (Contest c : teacher.getContest()) {
-                if (c.getId() == ContestId && c.getStatus().equals(Contest.Status.RELEASE)) {
+                if (c.getId() == ContestId && c.getStatus().equals(Contest.Status.PREPARING)) {
                     return true;
                 }
             }
@@ -76,26 +76,26 @@ public class ContestServiceImpl implements ContestService {
         return contestDAO.getPagedContests(pageSize, (pageNumber - 1) * pageSize);
     }
 
-    public Long getPageCount(int pageSize){
+    public Long getPageCount(int pageSize) {
         Long count = contestDAO.getEntryCount();
-        if (count%pageSize==0)
-            return count/pageSize;
-        else return count/pageSize+1;
+        if (count % pageSize == 0)
+            return count / pageSize;
+        else return count / pageSize + 1;
     }
-    
+
     public List<Contest> getPagedContests(Contest.Status status, int pageSize, int pageNumber) {
-        return contestDAO.getPagedContests(status, pageSize, (pageNumber-1)*pageSize);
+        return contestDAO.getPagedContests(status, pageSize, (pageNumber - 1) * pageSize);
     }
-    
-    public Long getPageCount(Contest.Status status, int pageSize){
-    	Long count = contestDAO.getEntryCount(status);  	
-    	if (count%pageSize==0)
-    	return count/pageSize;
-    	else return count/pageSize+1;
+
+    public Long getPageCount(Contest.Status status, int pageSize) {
+        Long count = contestDAO.getEntryCount(status);
+        if (count % pageSize == 0)
+            return count / pageSize;
+        else return count / pageSize + 1;
     }
 
     @Override
-    public Long getContestEndTime(Contest contest){
+    public Long getContestEndTime(Contest contest) {
         Calendar endDate = Calendar.getInstance();
         Calendar duration = Calendar.getInstance();
         endDate.setTime(contest.getStarts());
@@ -113,10 +113,23 @@ public class ContestServiceImpl implements ContestService {
     }
 
     @Override
-    public Long getUserEntryCount(int userId, int pageSize){
+    public Long getUserEntryCount(int userId, int pageSize) {
         Long count = contestDAO.getUserEntryCount(userId);
-        if (count%pageSize==0)
-            return count/pageSize;
-        else return count/pageSize+1;
+        if (count % pageSize == 0)
+            return count / pageSize;
+        else return count / pageSize + 1;
+    }
+
+    @Override
+    public List<Contest> getUserPagedContestsByStatus(int pageSize, int pageNumber, User user, Contest.Status status) {
+        return contestDAO.getUserPagedContestsByStatus(pageSize, (pageNumber - 1) * pageSize, user, status);
+    }
+
+    @Override
+    public Long getUserEntryCountByStatus(int userId, int pageSize, Contest.Status status) {
+        Long count = contestDAO.getUserEntryCountByStatus(userId, status);
+        if (count % pageSize == 0)
+            return count / pageSize;
+        else return count / pageSize + 1;
     }
 }

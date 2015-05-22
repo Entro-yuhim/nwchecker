@@ -95,8 +95,7 @@ public class ContestController {
                 .contains(new SimpleGrantedAuthority("ROLE_TEACHER")))) {
             count = contestService.getPageCount(pageSize);
             allContests = contestService.getPagedContests(pageSize, page);
-        } else
-        {
+        } else {
             User user = userService.getUserByUsername(principal.getName());
             List<String> editableContestIndexes = new LinkedList<String>();
             //getContests which user can edit:
@@ -431,30 +430,16 @@ public class ContestController {
     public String getContestsByStatus(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "3") int pageSize, @RequestParam("status") String status,
                                       Model model, Principal principal) {
         // get сontests by status from DB:
-        Long count = contestService.getPageCount(Contest.Status.stringToStatus(status), pageSize);
-        model.addAttribute("currentPage", page);
-        model.addAttribute("pageCount", count);
-
-        List<Contest> contestByStatus = contestService.getPagedContests(Contest.Status.stringToStatus(status), pageSize, page);
-        // get unhidden contests:
-        List<Contest> unhidden = new LinkedList<Contest>();
-        for (Contest c : contestByStatus) {
-            if (!c.isHidden()) {
-                unhidden.add(c);
-            }
-        }
-        if (principal == null) {
-            // return all "unhidden" contests:
-            model.addAttribute("contests", unhidden);
-            return "nwcserver.contests.list";
-        }
-
-        User user = userService.getUserByUsername(principal.getName());
-
-        if (((UsernamePasswordAuthenticationToken) principal).getAuthorities()
-                .contains(new SimpleGrantedAuthority("ROLE_TEACHER"))) {
+        Long count = null;
+        List<Contest> allContests = null;
+        if ((principal == null) || (!((UsernamePasswordAuthenticationToken) principal).getAuthorities()
+                .contains(new SimpleGrantedAuthority("ROLE_TEACHER")))) {
+            count = contestService.getPageCount(Contest.Status.stringToStatus(status), pageSize);
+            allContests = contestService.getPagedContests(Contest.Status.stringToStatus(status), pageSize, page);
+        } else {
+            User user = userService.getUserByUsername(principal.getName());
             List<String> editableContestIndexes = new LinkedList<String>();
-            // getContests which user can edit:
+            //getContests which user can edit:
             if ((user.getContest() != null) && (user.getContest().size() > 0)) {
                 for (Contest c : user.getContest()) {
                     if (c.getStatus().equals(Contest.Status.PREPARING)
@@ -464,20 +449,23 @@ public class ContestController {
                             editableContestIndexes.add("index" + c.getId()
                                     + "index");
                         }
-                        // add Contest to unhidden list:
-                        if (c.isHidden()) {
-                            unhidden.add(c);
-                        }
                     }
                 }
             }
+            count = contestService.getUserEntryCountByStatus(user.getUserId(), pageSize, Contest.Status.stringToStatus(status));
+            allContests = contestService.getUserPagedContestsByStatus(pageSize, page, user, Contest.Status.stringToStatus(status));
+
             model.addAttribute("editContestIndexes", editableContestIndexes);
             // set usernames for editing contests:
             model.addAttribute("nowContestEdits",
                     contestEditWatcherService.getNowEditsMap());
         }
-        model.addAttribute("contests", unhidden);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("pageCount", count);
+
+        model.addAttribute("contests", allContests);
         return "nwcserver.contests.list";
+
     }
 
 }

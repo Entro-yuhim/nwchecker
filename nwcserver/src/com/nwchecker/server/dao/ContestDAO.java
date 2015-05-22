@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * <h1>Contest DAO</h1>
  * DAO for working with Contest Entity table.
- * <p>
+ * <p/>
  *
  * @author Roman Zayats
  * @version 1.0
@@ -17,7 +17,7 @@ public interface ContestDAO {
 
     /**
      * Add new Contest to database.
-     * <p>
+     * <p/>
      *
      * @param c Contest that will be inserted in DB
      */
@@ -25,7 +25,7 @@ public interface ContestDAO {
 
     /**
      * Update existing Contest in database.
-     * <p>
+     * <p/>
      *
      * @param c Contest that will be updated in DB
      */
@@ -40,7 +40,7 @@ public interface ContestDAO {
 
     /**
      * Return all Contests from database.
-     * <p>
+     * <p/>
      *
      * @return List of Contests from DB
      */
@@ -48,7 +48,7 @@ public interface ContestDAO {
 
     /**
      * Return Contest from database by unique ID.
-     * <p>
+     * <p/>
      *
      * @param id Unique ID of required Contest
      * @return Contest from DB
@@ -57,29 +57,34 @@ public interface ContestDAO {
 
     /**
      * Return all Contests that has specific status.
-     * <p>
+     * <p/>
+     *
      * @param status Specific status of required Contests
      * @return List of Contests that have specific status
      */
-    List<Contest> getContestByStatus(Contest.Status status);
+    public List<Contest> getContestByStatus(Contest.Status status);
 
-	 public List<Contest> getPagedContests( int pageSize, int startIndex);
-	
-	 public Long getEntryCount();
+    public List<Contest> getPagedContests(int pageSize, int startIndex);
 
-	 public List<Contest> getPagedContests(Contest.Status status, int pageSize, int startIndex);
-		
-	 public Long getEntryCount(Contest.Status status);
+    public Long getEntryCount();
+
+    public List<Contest> getPagedContests(Contest.Status status, int pageSize, int startIndex);
+
+    public Long getEntryCount(Contest.Status status);
 
     List<Contest> getContestsForRating();
 
     List<Contest> getContestsWithDynamicRating();
 
-    public Contest getNearestContest() ;
+    public Contest getNearestContest();
 
     public Contest getLastArchivedContest();
 
     public List<Contest> getUserPagedContests(int pageSize, int startIndex, User user);
 
     public Long getUserEntryCount(int userId);
+
+    public List<Contest> getUserPagedContestsByStatus(int pageSize, int startPage, User user, Contest.Status status);
+
+    public Long getUserEntryCountByStatus(int userId, Contest.Status status);
 }

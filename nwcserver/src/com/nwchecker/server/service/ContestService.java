@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * <h1>Contest Service</h1>
  * Service that can save, update and delete Contests.
- * <p>
+ * <p/>
  *
  * @author Roman Zayats
  * @version 1.0
@@ -19,7 +19,7 @@ public interface ContestService {
 
     /**
      * Add new Contest to database.
-     * <p>
+     * <p/>
      *
      * @param c Contest that will be inserted in DB
      */
@@ -27,7 +27,7 @@ public interface ContestService {
 
     /**
      * Update existing Contest in database.
-     * <p>
+     * <p/>
      *
      * @param c Contest that will be updated in DB
      */
@@ -42,7 +42,7 @@ public interface ContestService {
 
     /**
      * Return all Contests from database.
-     * <p>
+     * <p/>
      *
      * @return List of Contests from DB
      */
@@ -50,7 +50,7 @@ public interface ContestService {
 
     /**
      * Return Contest from database by unique ID.
-     * <p>
+     * <p/>
      *
      * @param id Unique ID of required Contest
      * @return Contest from DB
@@ -59,7 +59,8 @@ public interface ContestService {
 
     /**
      * Return all Contests that has specific status.
-     * <p>
+     * <p/>
+     *
      * @param status Specific status of required Contests
      * @return List of Contests that have specific status
      */
@@ -68,17 +69,22 @@ public interface ContestService {
     List<Contest> getContestForRating();
 
     public boolean checkIfUserHaveAccessToContest(String username, int ContestId);
-    
+
     public List<Contest> getPagedContests(int pageSize, int pageNumber);
-    
+
     public List<Contest> getPagedContests(Contest.Status status, int pageSize, int pageNumber);
-    
+
     public Long getPageCount(int pageSize);
-    
+
     public Long getPageCount(Contest.Status status, int pageSize);
 
     Long getContestEndTime(Contest contest);
 
     public List<Contest> getUserPagedContests(int pageSize, int pageNumber, User user);
+
     public Long getUserEntryCount(int userId, int pageSize);
+
+    public List<Contest> getUserPagedContestsByStatus(int pageSize, int pageNumber, User user, Contest.Status status);
+
+    public Long getUserEntryCountByStatus(int userId, int pageSize, Contest.Status status);
 }

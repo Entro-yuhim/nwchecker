@@ -83,75 +83,81 @@ public class ContestDAOImpl extends HibernateDaoSupport implements ContestDAO {
     }
 
     @Transactional
-	@Override
-	public List<Contest> getPagedContests(int pageSize, int startIndex) {
-		Session session = getHibernateTemplate().getSessionFactory().getCurrentSession();
-		Query query = session.createQuery("from Contest where hidden=:hidden order by starts desc");
-		query.setFirstResult(startIndex);
-		query.setMaxResults(pageSize);
-		query.setParameter("hidden", false);
-		return query.list();
-	}
+    @Override
+    public List<Contest> getPagedContests(int pageSize, int startIndex) {
+        Session session = getHibernateTemplate().getSessionFactory().getCurrentSession();
+        Query query = session.createQuery("from Contest where hidden=:hidden order by starts desc");
+        query.setFirstResult(startIndex);
+        query.setMaxResults(pageSize);
+        query.setParameter("hidden", false);
+        return query.list();
+    }
 
 
     @Transactional
-	@Override
-	public Long getEntryCount() {
-		Session session = getHibernateTemplate().getSessionFactory().getCurrentSession();
-		Query query = session.createQuery("select count(*) from Contest where hidden=:hidden");
-		query.setParameter("hidden", false);
-		return (Long) query.uniqueResult();
-	}
-    
+    @Override
+    public Long getEntryCount() {
+        Session session = getHibernateTemplate().getSessionFactory().getCurrentSession();
+        Query query = session.createQuery("select count(*) from Contest where hidden=:hidden");
+        query.setParameter("hidden", false);
+        return (Long) query.uniqueResult();
+    }
+
     @Transactional
-	@Override
-	public List<Contest> getPagedContests(Contest.Status status ,int pageSize, int startIndex) {
-		Session session = getHibernateTemplate().getSessionFactory().getCurrentSession();
-		Query query = session.createQuery("from Contest where status = :status and hidden=:hidden order by starts desc");
-		query.setFirstResult(startIndex);
-		query.setMaxResults(pageSize);
-		query.setParameter("hidden", false);
-		query.setParameter("status", status);
-		return query.list();
-	}
+    @Override
+    public List<Contest> getPagedContests(Contest.Status status, int pageSize, int startIndex) {
+        Session session = getHibernateTemplate().getSessionFactory().getCurrentSession();
+        Query query = session.createQuery("from Contest where status = :status and hidden=:hidden order by starts desc");
+        query.setFirstResult(startIndex);
+        query.setMaxResults(pageSize);
+        query.setParameter("hidden", false);
+        query.setParameter("status", status);
+        return query.list();
+    }
+
     @Transactional
-	@Override
-	public Long getEntryCount(Contest.Status status) {
-		Session session = getHibernateTemplate().getSessionFactory().getCurrentSession();
-		Query query = session.createQuery("select count(*) from Contest where status = :status and hidden=:hidden");
-		query.setParameter("hidden", false);
-		query.setParameter("status", status);
-		return (Long) query.uniqueResult();
-	}
+    @Override
+    public Long getEntryCount(Contest.Status status) {
+        Session session = getHibernateTemplate().getSessionFactory().getCurrentSession();
+        Query query = session.createQuery("select count(*) from Contest where status = :status and hidden=:hidden");
+        query.setParameter("hidden", false);
+        query.setParameter("status", status);
+        return (Long) query.uniqueResult();
+    }
 
     @Override
     @Transactional
     public Contest getNearestContest() {
-        Session session = getHibernateTemplate().getSessionFactory().getCurrentSession();;
+        Session session = getHibernateTemplate().getSessionFactory().getCurrentSession();
+        ;
         Query query = session.createQuery("from Contest where status='RELEASE' order by starts asc");
         return (Contest) query.setMaxResults(1).uniqueResult();
     }
 
     @Override
     @Transactional
-    public Contest getLastArchivedContest(){
-        Session session = getHibernateTemplate().getSessionFactory().getCurrentSession();;
+    public Contest getLastArchivedContest() {
+        Session session = getHibernateTemplate().getSessionFactory().getCurrentSession();
+        ;
         Query query = session.createQuery("from Contest where status='ARCHIVE' order by starts desc");
         return (Contest) query.setMaxResults(1).uniqueResult();
     }
+
     @Transactional
     @Override
     public List<Contest> getUserPagedContests(int pageSize, int startIndex, User user) {
         Session session = getHibernateTemplate().getSessionFactory().getCurrentSession();
-        SQLQuery query= session.createSQLQuery("(select * from contest where hidden=0) union distinct (select c.* from contest c inner join contest_users cu on (cu.contest_id=c.id) where cu.user_id=:userId) order by starts desc ");
+        SQLQuery query = session.createSQLQuery("(select * from contest where hidden=0) union distinct (select c.* from contest c inner join contest_users cu on (cu.contest_id=c.id) where cu.user_id=:userId) order by starts desc ");
         query.setFirstResult(startIndex);
         query.setParameter("userId", user.getUserId());
         query.setMaxResults(pageSize);
-   //     query.setParameter("hidden", true);
+        //     query.setParameter("hidden", true);
         query.addEntity(Contest.class);
         return query.list();
     }
+
     @Transactional
+    @Override
     public Long getUserEntryCount(int userId) {
         Session session = getHibernateTemplate().getSessionFactory().getCurrentSession();
         SQLQuery query = session.createSQLQuery("select count(*) as count from ((select * from contest where hidden=0) union distinct (select c.* from contest c inner join contest_users cu on (cu.contest_id=c.id) where cu.user_id=:userId)) x ");
@@ -159,4 +165,29 @@ public class ContestDAOImpl extends HibernateDaoSupport implements ContestDAO {
         query.addScalar("count", LongType.INSTANCE);
         return (Long) query.uniqueResult();
     }
+
+    @Transactional
+    @Override
+    public List<Contest> getUserPagedContestsByStatus(int pageSize, int startPage, User user, Contest.Status status) {
+        Session session = getHibernateTemplate().getSessionFactory().getCurrentSession();
+        SQLQuery query = session.createSQLQuery("(select * from contest where status=:status and hidden=0 ) union distinct (select c.* from contest c inner join contest_users cu on (cu.contest_id=c.id) where cu.user_id=:userId) order by starts desc ");
+        query.setParameter("userId", user.getUserId());
+        query.setParameter("status", status);
+        query.setMaxResults(pageSize);
+        query.addEntity(Contest.class);
+        return query.list();
+    }
+
+    @Transactional
+    @Override
+    public Long getUserEntryCountByStatus(int userId, Contest.Status status) {
+        Session session = getHibernateTemplate().getSessionFactory().getCurrentSession();
+        SQLQuery query = session.createSQLQuery("select count(*) as count from ((select * from contest where status=:status and hidden=0) union distinct (select c.* from contest c inner join contest_users cu on (cu.contest_id=c.id) where cu.user_id=:userId)) x ");
+        query.setParameter("userId", userId);
+        query.setParameter("status", status);
+        query.addScalar("count", LongType.INSTANCE);
+        return (Long) query.uniqueResult();
+    }
+
+
 }
