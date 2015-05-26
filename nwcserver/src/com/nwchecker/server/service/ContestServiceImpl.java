@@ -83,8 +83,8 @@ public class ContestServiceImpl implements ContestService {
         else return count / pageSize + 1;
     }
 
-    public List<Contest> getPagedContests(Contest.Status status, int pageSize, int pageNumber) {
-        return contestDAO.getPagedContests(status, pageSize, (pageNumber - 1) * pageSize);
+    public List<Contest> getPagedContestsByStatus(Contest.Status status, int pageSize, int pageNumber) {
+        return contestDAO.getPagedContestsByStatus(status, pageSize, (pageNumber - 1) * pageSize);
     }
 
     public Long getPageCount(Contest.Status status, int pageSize) {

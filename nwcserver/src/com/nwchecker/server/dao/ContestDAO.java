@@ -68,7 +68,7 @@ public interface ContestDAO {
 
     public Long getEntryCount();
 
-    public List<Contest> getPagedContests(Contest.Status status, int pageSize, int startIndex);
+    public List<Contest> getPagedContestsByStatus(Contest.Status status, int pageSize, int startIndex);
 
     public Long getEntryCount(Contest.Status status);
 

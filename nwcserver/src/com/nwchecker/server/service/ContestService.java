@@ -72,7 +72,7 @@ public interface ContestService {
 
     public List<Contest> getPagedContests(int pageSize, int pageNumber);
 
-    public List<Contest> getPagedContests(Contest.Status status, int pageSize, int pageNumber);
+    public List<Contest> getPagedContestsByStatus(Contest.Status status, int pageSize, int pageNumber);
 
     public Long getPageCount(int pageSize);
 

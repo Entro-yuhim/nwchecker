@@ -8,6 +8,7 @@ import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.type.LongType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.transaction.TransactionScoped;
@@ -105,9 +107,9 @@ public class ContestDAOImpl extends HibernateDaoSupport implements ContestDAO {
 
     @Transactional
     @Override
-    public List<Contest> getPagedContests(Contest.Status status, int pageSize, int startIndex) {
+    public List<Contest> getPagedContestsByStatus(Contest.Status status, int pageSize, int startIndex) {
         Session session = getHibernateTemplate().getSessionFactory().getCurrentSession();
-        Query query = session.createQuery("from Contest where status = :status and hidden=:hidden order by starts desc");
+        Query query = session.createQuery("from Contest where status =:status and hidden=:hidden order by starts desc");
         query.setFirstResult(startIndex);
         query.setMaxResults(pageSize);
         query.setParameter("hidden", false);
@@ -170,11 +172,31 @@ public class ContestDAOImpl extends HibernateDaoSupport implements ContestDAO {
     @Override
     public List<Contest> getUserPagedContestsByStatus(int pageSize, int startPage, User user, Contest.Status status) {
         Session session = getHibernateTemplate().getSessionFactory().getCurrentSession();
-        SQLQuery query = session.createSQLQuery("(select * from contest where status=:status and hidden=0 ) union distinct (select c.* from contest c inner join contest_users cu on (cu.contest_id=c.id) where cu.user_id=:userId) order by starts desc ");
-        query.setParameter("userId", user.getUserId());
-        query.setParameter("status", status);
-        query.setMaxResults(pageSize);
-        query.addEntity(Contest.class);
+     //  SQLQuery query = session.createSQLQuery("select * from Contest c inner join contest_users c_u on (c.id = c_u.contest_id) where c.status =:status  and c.hidden =:hidden and c_u.user_id =:userId");
+//        Query query = session.createQuery("from Contest c join c.users u where c.status=:status and c.hidden = :hidden and u.userId=:userId");
+//        query.addEntity(Contest.class);
+//        query.setParameter("userId", user.getUserId());
+//        query.setParameter("status", status);
+//        query.setParameter("hidden", false);
+//        query.setFirstResult(startPage);
+//        query.setMaxResults(pageSize);
+//        System.out.println(user.getUserId() + " " + status + " " + startPage + " " + pageSize);
+////
+////
+////        System.out.println("TEST");
+//        List<Contest> listContest = query.list();
+//        Iterator it = listContest.iterator();
+//        while (it.hasNext()){
+//            System.out.println(it.next());
+//        }
+        List<Contest> abonements = session.createCriteria(Contest.class)
+                .add(Restrictions.eq("status", status))
+                .add(Restrictions.eq("hidden", false))
+                .createAlias("user", "user")
+                .add(Restrictions.ge("use_id", contest_id))
+                .setMaxResults(1)
+                .list();
+
         return query.list();
     }
 
@@ -182,10 +204,13 @@ public class ContestDAOImpl extends HibernateDaoSupport implements ContestDAO {
     @Override
     public Long getUserEntryCountByStatus(int userId, Contest.Status status) {
         Session session = getHibernateTemplate().getSessionFactory().getCurrentSession();
-        SQLQuery query = session.createSQLQuery("select count(*) as count from ((select * from contest where status=:status and hidden=0) union distinct (select c.* from contest c inner join contest_users cu on (cu.contest_id=c.id) where cu.user_id=:userId)) x ");
+        //SQLQuery query = session.createSQLQuery("select count(*) as count from ((select * from contest where status=:status and hidden=0) union distinct (select c.* from contest c inner join contest_users cu on (cu.contest_id=c.id) where cu.user_id=:userId)) x ");
+        Query query = session.createQuery("select count(*) from Contest c join c.users u where c.status=:status and c.hidden = :hidden and u.userId=:userId");
         query.setParameter("userId", userId);
         query.setParameter("status", status);
-        query.addScalar("count", LongType.INSTANCE);
+        query.setParameter("hidden", false);
+       // query.addScalar("count", LongType.INSTANCE);
+        System.out.println(query.uniqueResult());
         return (Long) query.uniqueResult();
     }
 

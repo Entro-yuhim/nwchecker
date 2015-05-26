@@ -435,7 +435,7 @@ public class ContestController {
         if ((principal == null) || (!((UsernamePasswordAuthenticationToken) principal).getAuthorities()
                 .contains(new SimpleGrantedAuthority("ROLE_TEACHER")))) {
             count = contestService.getPageCount(Contest.Status.stringToStatus(status), pageSize);
-            allContests = contestService.getPagedContests(Contest.Status.stringToStatus(status), pageSize, page);
+            allContests = contestService.getPagedContestsByStatus(Contest.Status.stringToStatus(status), pageSize, page);
         } else {
             User user = userService.getUserByUsername(principal.getName());
             List<String> editableContestIndexes = new LinkedList<String>();
