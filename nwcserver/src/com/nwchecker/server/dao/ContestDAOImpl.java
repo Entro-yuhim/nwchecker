@@ -192,7 +192,8 @@ public class ContestDAOImpl extends HibernateDaoSupport implements ContestDAO {
 
 	@Transactional
 	@Override
-	public List<Contest> getUserPagedContestsByStatus(int pageSize,	int startPage, User user, Contest.Status status) {
+	public List<Contest> getUserPagedContestsByStatus(int pageSize,
+			int startPage, User user, Contest.Status status) {
 		Session session = getHibernateTemplate().getSessionFactory()
 				.getCurrentSession();
 		SQLQuery query = session
@@ -217,5 +218,4 @@ public class ContestDAOImpl extends HibernateDaoSupport implements ContestDAO {
 		query.addScalar("count", LongType.INSTANCE);
 		return (Long) query.uniqueResult();
 	}
-
 }
