@@ -216,6 +216,7 @@ public class ContestDAOImpl extends HibernateDaoSupport implements ContestDAO {
 		query.setParameter("userId", userId);
 		query.setParameter("status", status.toString());
 		query.addScalar("count", LongType.INSTANCE);
+		System.out.println(query.uniqueResult());
 		return (Long) query.uniqueResult();
 	}
 }

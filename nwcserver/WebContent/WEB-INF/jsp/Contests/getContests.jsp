@@ -36,9 +36,9 @@
 						</c:when><c:when test="${param.status == 'ARCHIVE'}">
 							<spring:message code="contest.archive.label" />
 						</c:when>
-						<c:otherwise>
+							<c:when test="${param.status == null}">
 							<spring:message code="contest.status.all.label"/>
-						</c:otherwise>
+							</c:when>
 					</c:choose>
 
 					<span class="caret"></span>
@@ -47,19 +47,19 @@
 					<li><a href="<c:url value="/getContests.do"/>">
 						<spring:message code="contest.status.all.label"/></a></li>
 					<li><a
-						href="<c:url value="/getContestsByStatus.do?status=GOING"/>">
+						href="<c:url value="/getContests.do?status=GOING"/>">
 							<spring:message code="contest.going.label" />
 					</a></li>
 					<li><a
-						href="<c:url value="/getContestsByStatus.do?status=PREPARING"/>">
+						href="<c:url value="/getContests.do?status=PREPARING"/>">
 							<spring:message code="contest.preparing.label" />
 					</a></li>
 					<li><a
-						href="<c:url value="/getContestsByStatus.do?status=RELEASE"/>">
+						href="<c:url value="/getContests.do?status=RELEASE"/>">
 							<spring:message code="contest.release.label" />
 					</a></li>
 					<li><a
-						href="<c:url value="/getContestsByStatus.do?status=ARCHIVE"/>">
+						href="<c:url value="/getContests.do?status=ARCHIVE"/>">
 							<spring:message code="contest.archive.label" />
 					</a></li>
 				</ul>
@@ -200,6 +200,7 @@
 				<div class="text-center">
 					<ul class="pagination">
 						<!-- "Previous" button -->
+						<c:set var="status" value="null"/>
 						<c:if test="${currentPage gt 1}">
 							<li><a
 									href="<c:url value="/getContests.do">
